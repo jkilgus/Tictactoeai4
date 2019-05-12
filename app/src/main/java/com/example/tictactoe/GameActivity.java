@@ -22,10 +22,11 @@
         import java.util.LinkedList;
         import java.util.List;
 
-
+// AdapterView.OnItemSelectedListener is for the Spinner to select themes
 public class GameActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private Button exit;
 
+    // Sounds for end game conditions
     MediaPlayer tieSound;
     MediaPlayer winSound;
     MediaPlayer loseSound;
