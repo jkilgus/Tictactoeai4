@@ -3,7 +3,6 @@ package com.example.tictactoe;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
@@ -17,7 +16,7 @@ import java.util.List;
  * This PDF Viewer was created by github user: barteksc
  * https://github.com/barteksc/AndroidPdfViewer
  *
- * I followed barteksc's installation guide as best as I could and when
+ * I followed barteksc's installation guide as well as I could and when
  * I got stuck I found a solution on this stackoverflow page:
  * https://stackoverflow.com/questions/9666030/display-pdf-file-inside-my-android-application#42246889
  *
@@ -35,9 +34,13 @@ import java.util.List;
  * to ensure future stability. The solution is here:
  * https://stackoverflow.com/questions/42374151/all-com-android-support-libraries-must-use-the-exact-same-version-specification
  *
- * In my case I needed to add two more lines of implementation:
+ * In my case I needed to add two more lines inside of dependencies:
  *     implementation 'com.android.support:support-media-compat:28.0.0'
  *     implementation 'com.android.support:support-v4:28.0.0'
+ *
+ * So in summary, first add those three lines to the build.gradle file. Then create your assets
+ * folder and file(s). Then use the stackoverflow example as a template of one way
+ * that you could implement the reader.
  *
  */
 public class InfoActivity extends AppCompatActivity implements OnPageChangeListener, OnLoadCompleteListener {
@@ -61,7 +64,6 @@ public class InfoActivity extends AppCompatActivity implements OnPageChangeListe
         pdfView.fromAsset("manual.pdf")
                 .defaultPage(pageNumber)
                 .enableSwipe(true)
-
                 .swipeHorizontal(false)
                 .onPageChange(this)
                 .enableAnnotationRendering(true)

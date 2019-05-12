@@ -63,6 +63,8 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
     private static final String[] paths = {"Orange and Purple", "VTC Green and Gold", "Green and Blue",
             "Red and Blue", "Robinhood Brown and Green", "Jungle", "High-Tech"};
 
+    private int theme;
+
     TextView output;
 
     Player x;
@@ -138,21 +140,27 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
         switch (position) {
             case 0:
                 frame.setBackgroundResource(R.drawable.tictactemplate_orange_purp);
+                theme = 1;
                 break;
             case 1:
                 frame.setBackgroundResource(R.drawable.tictactemplate_greengoldvtc);
+                theme = 2;
                 break;
             case 2:
                 frame.setBackgroundResource(R.drawable.tictactemplate_greenblue);
+                theme = 3;
                 break;
             case 3:
                 frame.setBackgroundResource(R.drawable.tictactemplate_redblue);
+                theme = 4;
                 break;
             case 4:
                 frame.setBackgroundResource(R.drawable.tictactemplate_robinhood);
+                theme = 5;
                 break;
             case 5:
                 frame.setBackgroundResource(R.drawable.tictactemplate_jungle);
+                theme = 6;
                 break;
             case 6:
                 frame.setBackgroundResource(R.drawable.tictactemplate_hightech);
@@ -174,7 +182,11 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
         // Player one's turn
         if ((turnNumber % 2) == 1) {
 
-            view.setBackgroundResource(R.drawable.x);
+            if (theme == 6) {
+                view.setBackgroundResource(R.drawable.cat);
+            } else {
+                view.setBackgroundResource(R.drawable.x);
+            }
 
             output.setText("O's turn to play!");
             unsetNumbers.remove(view);
@@ -256,7 +268,11 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         // Player two's turn
         else if (((turnNumber % 2) == 0) && aiMode.equalsIgnoreCase("pvp")) {
-            view.setBackgroundResource(R.drawable.o);
+            if (theme == 6) {
+                view.setBackgroundResource(R.drawable.dog);
+            } else {
+                view.setBackgroundResource(R.drawable.o);
+            }
 
 
             output.setText("X's turn to play!");
@@ -452,7 +468,14 @@ Easy mode: Choose random open game space.
         System.out.println("Easy\n");
         turnNumber++;
         Collections.shuffle(unsetNumbers);
-        unsetNumbers.get(0).setBackgroundResource(R.drawable.o);
+
+        // Sets playable icons from default x, o, or per theme
+        if (theme == 6) {
+            unsetNumbers.get(0).setBackgroundResource(R.drawable.dog);
+        } else {
+            unsetNumbers.get(0).setBackgroundResource(R.drawable.o);
+        }
+
         output.setText("X's turn to play!");
         unsetNumbers.get(0).setEnabled(false);
         for (int i = 0; i < 9; i++) {
@@ -483,7 +506,11 @@ Easy mode: Choose random open game space.
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (board[i][j] == 'X' && unsetNumbers.contains(numbers[(i*3)+j])) {
-                    numbers[(i*3)+j].setBackgroundResource(R.drawable.o);
+                    if (theme == 6) {
+                        numbers[(i*3)+j].setBackgroundResource(R.drawable.dog);
+                    } else {
+                        numbers[(i*3)+j].setBackgroundResource(R.drawable.o);
+                    }
                     output.setText("X's turn to play!");
                     gamePlays[(i*3)+j] = 2;
                     unsetNumbers.remove(numbers[(i*3)+j]);
