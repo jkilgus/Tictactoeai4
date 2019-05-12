@@ -1,16 +1,19 @@
         package com.example.tictactoe;
+        import android.media.MediaPlayer;
         import android.os.Handler;
         import android.support.v7.app.AppCompatActivity;
         import android.os.Bundle;
         import android.view.View;
+        import android.widget.AdapterView;
+        import android.widget.ArrayAdapter;
         import android.widget.Button;
-        import android.widget.CheckBox;
+        import android.widget.FrameLayout;
+        import android.widget.Spinner;
         import android.widget.TextView;
 
         import com.example.tictactoe.AIGamePlayingSolution.src.minimax.Action;
         import com.example.tictactoe.AIGamePlayingSolution.src.minimax.AlphaBetaPlayer;
         import com.example.tictactoe.AIGamePlayingSolution.src.minimax.HumanPlayer;
-        import com.example.tictactoe.AIGamePlayingSolution.src.minimax.MinimaxPlayer;
         import com.example.tictactoe.AIGamePlayingSolution.src.minimax.Player;
         import com.example.tictactoe.AIGamePlayingSolution.src.tictactoe.TicTacToeState;
 
@@ -19,10 +22,13 @@
         import java.util.LinkedList;
         import java.util.List;
 
-        import static java.lang.Thread.sleep;
 
-public class GameActivity extends AppCompatActivity {
+public class GameActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private Button exit;
+
+    MediaPlayer tieSound;
+    MediaPlayer winSound;
+    MediaPlayer loseSound;
 
     /**
      * gamePlay is an array with 9 elements, one for each place in tictactoe
@@ -44,10 +50,17 @@ public class GameActivity extends AppCompatActivity {
 
     //---
     /**If the game is in AI mode the set true in code*/
-    private String aiMode; //Only manually true for testing
+    private String aiMode;
+    private boolean ai;
 
     /**Updates to have all possible moves if in AI mode*/
     private List<View> unsetNumbers;
+
+    // For setting the game board background image
+    private FrameLayout frame;
+    private Spinner spinner;
+    private static final String[] paths = {"Orange and Purple", "VTC Green and Gold", "Green and Blue",
+            "Red and Blue", "Robinhood Brown and Green", "Jungle", "High-Tech"};
 
     TextView output;
 
@@ -60,10 +73,30 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+        // For setting game board background
+        frame = findViewById(R.id.PVC_MODE);
+        spinner = findViewById(R.id.spinner);
+        ArrayAdapter<String>adapter = new ArrayAdapter<String>(GameActivity.this,
+                android.R.layout.simple_spinner_item,paths);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
+
         aiMode = getIntent().getExtras().getString("com.example.tictactoe.MESSAGE");
         System.out.println(aiMode);
+        if (aiMode.equals("pvceasy") || aiMode.equals("pvcmed") || aiMode.equals("pvchard")) {
+            ai = true;
+        } else {
+            ai = false;
+        }
+
         turnNumber = 0;
         winner = false;
+
+        tieSound = MediaPlayer.create(this, R.raw.tie);
+        loseSound = MediaPlayer.create(this, R.raw.lose1);
+        winSound = MediaPlayer.create(this, R.raw.win);
 
         exit = findViewById(R.id.exit);
         exit.setOnClickListener(new View.OnClickListener() {
@@ -98,6 +131,39 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
+    // Set selected game board background from spinner choice
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
+        switch (position) {
+            case 0:
+                frame.setBackgroundResource(R.drawable.tictactemplate_orange_purp);
+                break;
+            case 1:
+                frame.setBackgroundResource(R.drawable.tictactemplate_greengoldvtc);
+                break;
+            case 2:
+                frame.setBackgroundResource(R.drawable.tictactemplate_greenblue);
+                break;
+            case 3:
+                frame.setBackgroundResource(R.drawable.tictactemplate_redblue);
+                break;
+            case 4:
+                frame.setBackgroundResource(R.drawable.tictactemplate_robinhood);
+                break;
+            case 5:
+                frame.setBackgroundResource(R.drawable.tictactemplate_jungle);
+                break;
+            case 6:
+                frame.setBackgroundResource(R.drawable.tictactemplate_hightech);
+        }
+    }
+
+    // When nothing is selected on the background spinner
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        // TODO Auto-generated method stub
+    }
+
     public void buttonClick(View view) {
 
         // Make a way to try again/play again
@@ -106,13 +172,9 @@ public class GameActivity extends AppCompatActivity {
 
         // Player one's turn
         if ((turnNumber % 2) == 1) {
-           /* if(aiMode.equalsIgnoreCase("pvchard")) {
-                int value = numbers.get(view);
-                state = new TicTacToeState(o, board);
-                Action move = o.chooseMove(state);
-                state = (TicTacToeState) move.perform();
-            } */
-            view.setBackgroundResource(R.drawable.cat);
+
+            view.setBackgroundResource(R.drawable.x);
+
             output.setText("O's turn to play!");
             unsetNumbers.remove(view);
             int i;
@@ -124,6 +186,7 @@ public class GameActivity extends AppCompatActivity {
                 }
             }
             if (aiMode.equalsIgnoreCase("pvcmed") || aiMode.equalsIgnoreCase("pvchard")) {
+
                 int row;
                 int col;
                 row = i/3;
@@ -135,6 +198,7 @@ public class GameActivity extends AppCompatActivity {
                 Action playerMove = new Action(state, 1);
                 playerMove.perform();
                 checkWin();
+
                 }
 
             view.setEnabled(false);
@@ -191,7 +255,9 @@ public class GameActivity extends AppCompatActivity {
         }
         // Player two's turn
         else if (((turnNumber % 2) == 0) && aiMode.equalsIgnoreCase("pvp")) {
-            view.setBackgroundResource(R.drawable.dog);
+            view.setBackgroundResource(R.drawable.o);
+
+
             output.setText("X's turn to play!");
             for (int i = 0; i < 9; i++) {
                 if (view == numbers[i]) {
@@ -218,41 +284,49 @@ public class GameActivity extends AppCompatActivity {
         if (gamePlays[0] == 1 && gamePlays[1] == 1 && gamePlays[2] == 1) {
             output.setText("The winner is X!");
             winner = true;
+            winSound.start();
             disableTiles();
         }
         if(gamePlays[0] == 1 && gamePlays[3] == 1 && gamePlays[6] == 1) {
             output.setText("The winner is X!");
             winner = true;
+            winSound.start();
             disableTiles();
         }
         if(gamePlays[2] == 1 && gamePlays[5] == 1 && gamePlays[8] == 1) {
             output.setText("The winner is X!");
             winner = true;
+            winSound.start();
             disableTiles();
         }
         if(gamePlays[6] == 1 && gamePlays[7] == 1 && gamePlays[8] == 1) {
             output.setText("The winner is X!");
             winner = true;
+            winSound.start();
             disableTiles();
         }
         if(gamePlays[3] == 1 && gamePlays[4] == 1 && gamePlays[5] == 1) {
             output.setText("The winner is X!");
             winner = true;
+            winSound.start();
             disableTiles();
         }
         if(gamePlays[1] == 1 && gamePlays[4] == 1 && gamePlays[7] == 1) {
             output.setText("The winner is X!");
             winner = true;
+            winSound.start();
             disableTiles();
         }
         if(gamePlays[0] == 1 && gamePlays[4] == 1 && gamePlays[8] == 1) {
             output.setText("The winner is X!");
             winner = true;
+            winSound.start();
             disableTiles();
         }
         if(gamePlays[6] == 1 && gamePlays[4] == 1 && gamePlays[2] == 1) {
             output.setText("The winner is X!");
             winner = true;
+            winSound.start();
             disableTiles();
         }
     }
@@ -262,41 +336,81 @@ public class GameActivity extends AppCompatActivity {
         if (gamePlays[0] == 2 &&  gamePlays[1] == 2 && gamePlays[2] == 2) {
             output.setText("The winner is 0!");
             winner = true;
+            if(ai) {
+                loseSound.start();
+            } else {
+                winSound.start();
+            }
             disableTiles();
         }
         if(gamePlays[0] == 2 && gamePlays[3] == 2 && gamePlays[6] == 2) {
             output.setText("The winner is O!");
             winner = true;
+            if(ai) {
+                loseSound.start();
+            } else {
+                winSound.start();
+            }
             disableTiles();
         }
         if(gamePlays[2] == 2 && gamePlays[5] == 2 && gamePlays[8] == 2) {
             output.setText("The winner is O!");
             winner = true;
+            if(ai) {
+                loseSound.start();
+            } else {
+                winSound.start();
+            }
             disableTiles();
         }
         if(gamePlays[6] == 2 && gamePlays[7] == 2 && gamePlays[8] == 2) {
             output.setText("The winner is O!");
             winner = true;
+            if(ai) {
+                loseSound.start();
+            } else {
+                winSound.start();
+            }
             disableTiles();
         }
         if(gamePlays[3] == 2 && gamePlays[4] == 2 && gamePlays[5] == 2) {
             output.setText("The winner is O!");
             winner = true;
+            if(ai) {
+                loseSound.start();
+            } else {
+                winSound.start();
+            }
             disableTiles();
         }
         if(gamePlays[1] == 2 && gamePlays[4] == 2 && gamePlays[7] == 2) {
             output.setText("The winner is O!");
             winner = true;
+            if(ai) {
+                loseSound.start();
+            } else {
+                winSound.start();
+            }
             disableTiles();
         }
         if(gamePlays[0] == 2 && gamePlays[4] == 2 && gamePlays[8] == 2) {
             output.setText("The winner is O!");
             winner = true;
+            if(ai) {
+                loseSound.start();
+            } else {
+                winSound.start();
+            }
             disableTiles();
         }
         if(gamePlays[6] == 2 && gamePlays[4] == 2 && gamePlays[2] == 2) {
             output.setText("The winner is O!");
             winner = true;
+            if(ai) {
+                loseSound.start();
+            } else {
+                winSound.start();
+            }
             disableTiles();
         }
     }
@@ -306,6 +420,7 @@ public class GameActivity extends AppCompatActivity {
         if(gamePlays[0] != 0 && gamePlays[1] != 0 && gamePlays[2] != 0 && gamePlays[3] != 0 && gamePlays[4] != 0
                 && gamePlays[5] != 0 && gamePlays[6] != 0 && gamePlays[7] != 0 && gamePlays[8] != 0 && !winner) {
             winner =  true;
+            tieSound.start();
             output.setText("Tie game!");
         }
     }
@@ -313,6 +428,18 @@ public class GameActivity extends AppCompatActivity {
     private void disableTiles() {
         for(int i = 0; i < 9; i++) {
             numbers[i].setEnabled(false);
+        }
+    }
+
+    public void resetGame(View view) {
+        turnNumber = 0;
+        unsetNumbers = new LinkedList<>(Arrays.asList(numbers));
+        winner = false;
+
+        for(int a = 0; a < 9; a++) {
+            gamePlays[a] =0;
+            numbers[a].setEnabled(true);
+            numbers[a].setBackgroundResource(R.drawable.tile);
         }
     }
 
@@ -324,7 +451,7 @@ Easy mode: Choose random open game space.
         System.out.println("Easy\n");
         turnNumber++;
         Collections.shuffle(unsetNumbers);
-        unsetNumbers.get(0).setBackgroundResource(R.drawable.dog);
+        unsetNumbers.get(0).setBackgroundResource(R.drawable.o);
         output.setText("X's turn to play!");
         unsetNumbers.get(0).setEnabled(false);
         for (int i = 0; i < 9; i++) {
@@ -355,7 +482,7 @@ Easy mode: Choose random open game space.
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (board[i][j] == 'X' && unsetNumbers.contains(numbers[(i*3)+j])) {
-                    numbers[(i*3)+j].setBackgroundResource(R.drawable.dog);
+                    numbers[(i*3)+j].setBackgroundResource(R.drawable.o);
                     output.setText("X's turn to play!");
                     gamePlays[(i*3)+j] = 2;
                     unsetNumbers.remove(numbers[(i*3)+j]);
@@ -364,16 +491,6 @@ Easy mode: Choose random open game space.
             }
         }
 
-
-        //Using row/col from AI
-/*
-        int bl = (state.getRow()*3) + state.getCol();
-        board[state.getRow()][state.getCol()] = 'X';
-        numbers[bl].setBackgroundResource(R.drawable.dog);
-        gamePlays[bl] = 2;
-        unsetNumbers.remove(numbers[bl]);
-        numbers[bl].setEnabled(false);
-*/
         System.out.println(state);
         output.setText("O's turn to play!");
         checkWin();
