@@ -22,7 +22,7 @@
         import java.util.LinkedList;
         import java.util.List;
 
-// AdapterView.OnItemSelectedListener is for the Spinner to select themes
+/** AdapterView.OnItemSelectedListener is for the Spinner to select themes **/
 public class GameActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private Button exit;
 
@@ -57,7 +57,7 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
     /**Updates to have all possible moves if in AI mode*/
     private List<View> unsetNumbers;
 
-    // For setting the game board background image
+    /**For setting the game board background image **/
     private FrameLayout frame;
     private Spinner spinner;
     private static final String[] paths = {"Orange and Purple", "VTC Green and Gold", "Green and Blue",
@@ -76,7 +76,7 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        // For setting game board background
+        /** For setting game board background with spinner **/
         frame = findViewById(R.id.PVC_MODE);
         spinner = findViewById(R.id.spinner);
         ArrayAdapter<String>adapter = new ArrayAdapter<String>(GameActivity.this,
@@ -86,6 +86,7 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
 
+        /** Recieve difficulty setting from previous screen to choose AI mode **/
         aiMode = getIntent().getExtras().getString("com.example.tictactoe.MESSAGE");
         System.out.println(aiMode);
         if (aiMode.equals("pvceasy") || aiMode.equals("pvcmed") || aiMode.equals("pvchard")) {
@@ -94,13 +95,16 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
             ai = false;
         }
 
+        /** Initialize game state with turn number zero, and no winner **/
         turnNumber = 0;
         winner = false;
 
+        /** Sound effects for various end game states **/
         tieSound = MediaPlayer.create(this, R.raw.tie);
         loseSound = MediaPlayer.create(this, R.raw.lose1);
         winSound = MediaPlayer.create(this, R.raw.win);
 
+        /** Exit button **/
         exit = findViewById(R.id.exit);
         exit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,6 +113,7 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
+        /** The game tiles **/
         numbers[0] = findViewById(R.id.one);
         numbers[1] = findViewById(R.id.two);
         numbers[2] = findViewById(R.id.three);
@@ -119,8 +124,13 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
         numbers[7] = findViewById(R.id.eight);
         numbers[8] = findViewById(R.id.nine);
 
+        /** Tiles yet to be played on, for consideration by the AI **/
         unsetNumbers = new LinkedList<>(Arrays.asList(numbers));
+
+        /** Text output to display end game condition: Win, Lose, Tie **/
         output = findViewById(R.id.game_state);
+
+        /** Create new X and O players, create new game board state **/
         if (aiMode.equalsIgnoreCase("pvcmed") || aiMode.equalsIgnoreCase("pvchard")) {
             x = new AlphaBetaPlayer("X");
             o = new HumanPlayer("O");
@@ -134,7 +144,11 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-    // Set selected game board background from spinner choice
+    /** This switch operates the Spinner dropdown choice menu
+     * Each theme has it's own background and some have special
+     * image tiles and ideally their own sounds too
+     * The theme number is being kept track of so that playable icons
+     * can be chosen during the player functions below using if statements**/
     @Override
     public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
         switch (position) {
@@ -164,10 +178,13 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
                 break;
             case 6:
                 frame.setBackgroundResource(R.drawable.tictactemplate_hightech);
+                theme = 7;
+                break;
         }
     }
 
-    // When nothing is selected on the background spinner
+    /** When nothing is selected on the background spinner nothing happens
+     * but java would still like to have this method here**/
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
         // TODO Auto-generated method stub
@@ -175,19 +192,21 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void buttonClick(View view) {
 
-        // Make a way to try again/play again
-
         turnNumber++;
 
-        // Player one's turn
+        /** Player 1's turn **/
         if ((turnNumber % 2) == 1) {
 
+            /** Set playable icons based on theme **/
             if (theme == 6) {
                 view.setBackgroundResource(R.drawable.cat);
             } else {
                 view.setBackgroundResource(R.drawable.x);
             }
 
+            /** After move is made, set text to show it's the next player's turn
+             * and update the state of the game board
+             */
             output.setText("O's turn to play!");
             unsetNumbers.remove(view);
             int i;
@@ -198,6 +217,8 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
                     break;
                 }
             }
+
+            /** If playing versus a Computer player in medium or hard, this section gets activated **/
             if (aiMode.equalsIgnoreCase("pvcmed") || aiMode.equalsIgnoreCase("pvchard")) {
 
                 int row;
@@ -211,11 +232,18 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
                 Action playerMove = new Action(state, 1);
                 playerMove.perform();
                 checkWin();
-
                 }
 
+            /** After Player 1 the human player has gone, and the medium and hard AI have
+             * gotten a chance to run, the view is disabled and we check for win states
+             */
             view.setEnabled(false);
             checkWin();
+
+            /** These sections modulate the various AI difficulties.
+             * If easy mode, easy AI is simply called. If Hard AI, hard AI is called.
+             * For Medium AI, alternating calls are made between Easy and Hard AI.
+             */
             if(aiMode.equalsIgnoreCase("pvceasy") && winner==false) {
                 output.setText("O's turn to play!");
                 Runnable r = new Runnable() {
@@ -266,20 +294,21 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
                 hand.postDelayed(r, 1000);
             }
         }
-        // Player two's turn
+
+        /** For player vs player mode, this is player 2's turn **/
         else if (((turnNumber % 2) == 0) && aiMode.equalsIgnoreCase("pvp")) {
+
+            /** Custom playable icons based on theme **/
             if (theme == 6) {
                 view.setBackgroundResource(R.drawable.dog);
             } else {
                 view.setBackgroundResource(R.drawable.o);
             }
 
-
             output.setText("X's turn to play!");
             for (int i = 0; i < 9; i++) {
                 if (view == numbers[i]) {
                     gamePlays[i] = 2;
-                    //unsetNumbers.remove(view);
                 }
             }
             view.setEnabled(false);
@@ -287,7 +316,7 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-
+    /** Checking to see if the game is over **/
     private void checkWin() {
         checkWinPlayerOne();
 
@@ -296,6 +325,7 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
         checkTie();
     }
 
+    /** Tests every combination of 3 in a row for win states **/
     private void checkWinPlayerOne () {
         TextView output = findViewById(R.id.game_state);
         if (gamePlays[0] == 1 && gamePlays[1] == 1 && gamePlays[2] == 1) {
@@ -348,6 +378,7 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
+    /** Again, testing every combination of 3 in a row but this time for player 2 **/
     private void checkWinPlayerTwo() {
         TextView output = findViewById(R.id.game_state);
         if (gamePlays[0] == 2 &&  gamePlays[1] == 2 && gamePlays[2] == 2) {
@@ -432,6 +463,10 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
+    /** If a tie occurs, winner must still be set to true. It doesn't mean there is actually
+     * a winner, but when it is set to true that means the end state is triggered. Without this
+     * the game keeps running.
+     */
     private void checkTie() {
         TextView output = findViewById(R.id.game_state);
         if(gamePlays[0] != 0 && gamePlays[1] != 0 && gamePlays[2] != 0 && gamePlays[3] != 0 && gamePlays[4] != 0
@@ -442,30 +477,60 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
+    /** Disable tiles so you can't make multiple moves quickly before the computer goes **/
     private void disableTiles() {
         for(int i = 0; i < 9; i++) {
             numbers[i].setEnabled(false);
         }
     }
 
+    /** Restarts the game so you don't have to go back a menu to start again **/
     public void resetGame(View view) {
         turnNumber = 0;
         unsetNumbers = new LinkedList<>(Arrays.asList(numbers));
         winner = false;
 
         for(int a = 0; a < 9; a++) {
-            gamePlays[a] =0;
+            gamePlays[a] = 0;
             numbers[a].setEnabled(true);
             numbers[a].setBackgroundResource(R.drawable.tile);
         }
+
+        /** The game tiles **/
+        numbers[0] = findViewById(R.id.one);
+        numbers[1] = findViewById(R.id.two);
+        numbers[2] = findViewById(R.id.three);
+        numbers[3] = findViewById(R.id.four);
+        numbers[4] = findViewById(R.id.five);
+        numbers[5] = findViewById(R.id.six);
+        numbers[6] = findViewById(R.id.seven);
+        numbers[7] = findViewById(R.id.eight);
+        numbers[8] = findViewById(R.id.nine);
+
+        /** Tiles yet to be played on, for consideration by the AI **/
+        unsetNumbers = new LinkedList<>(Arrays.asList(numbers));
+
+        /** Text output to display end game condition: Win, Lose, Tie **/
+        output = findViewById(R.id.game_state);
+
+        /** Create new X and O players, create new game board state **/
+        if (aiMode.equalsIgnoreCase("pvcmed") || aiMode.equalsIgnoreCase("pvchard")) {
+            x = new AlphaBetaPlayer("X");
+            o = new HumanPlayer("O");
+            state = new TicTacToeState(x, o, board);
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    board[i][j] = '-';
+                }
+            }
+        }
     }
 
-    /*
-By default player two is the AI in AI mode.
-Easy mode: Choose random open game space.
- */
+    /**
+    By default player two is the AI in AI mode.
+    Easy mode: Choose random open game space.
+    */
     private void aiEasyPlay() {
-        System.out.println("Easy\n");
         turnNumber++;
         Collections.shuffle(unsetNumbers);
 
@@ -492,7 +557,6 @@ Easy mode: Choose random open game space.
 
     private void aiHardPlay() {
         turnNumber++;
-        System.out.println("Hard\n");
         state.setBoard(board);
         Action move = x.chooseMove(state);
         state = (TicTacToeState) move.perform();
@@ -518,8 +582,6 @@ Easy mode: Choose random open game space.
                 }
             }
         }
-
-        System.out.println(state);
         output.setText("O's turn to play!");
         checkWin();
     }
