@@ -27,7 +27,7 @@
 public class GameActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private Button exit;
 
-    // Sounds for end game conditions
+    /** Sounds for end game conditions **/
     MediaPlayer tieSound;
     MediaPlayer winSound;
     MediaPlayer loseSound;
@@ -64,10 +64,13 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
     private static final String[] paths = {"Orange and Purple", "VTC Green and Gold", "Green and Blue",
             "Red and Blue", "Robinhood Brown and Green", "Jungle", "High-Tech"};
 
+    /** Tracks which theme is selected **/
     private int theme;
 
+    /** Output text view to show who won or if it was a tie, or who's turn it is **/
     TextView output;
 
+    /** Initialize players and game board **/
     Player x;
     Player o;
     TicTacToeState state;
