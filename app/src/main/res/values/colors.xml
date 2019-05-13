@@ -6,5 +6,8 @@
     <color name="landing_button">#F75C10</color>
     <color name="text_color">#422A1E</color>
     <color name="background_color">#FCEEDF</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
 
 </resources>

@@ -27,7 +27,7 @@
         android:layout_marginTop="120dp">
 
         <ImageButton
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="8dp"
             android:id="@+id/one"
             android:layout_width="90dp"
             android:layout_height="80dp"
@@ -55,23 +55,23 @@
         android:layout_marginTop="-90dp">
 
         <ImageButton
-            android:layout_marginLeft="-4dp"
+            android:layout_marginLeft="3dp"
             android:id="@+id/four"
-            android:layout_width="@dimen/image_button_h_w"
+            android:layout_width="90dp"
             android:layout_height="80dp"
             android:onClick="buttonClick"/>
 
         <ImageButton
-            android:layout_marginLeft="0dp"
+            android:layout_marginLeft="10dp"
             android:id="@+id/five"
-            android:layout_width="@dimen/image_button_h_w"
+            android:layout_width="90dp"
             android:layout_height="80dp"
             android:onClick="buttonClick"/>
 
         <ImageButton
-            android:layout_marginLeft="5dp"
+            android:layout_marginLeft="10dp"
             android:id="@+id/six"
-            android:layout_width="@dimen/image_button_h_w"
+            android:layout_width="90dp"
             android:layout_height="80dp"
             android:onClick="buttonClick"/>
 
@@ -86,23 +86,23 @@
         android:layout_marginTop="0dp">
 
         <ImageButton
-            android:layout_marginLeft="-4dp"
+            android:layout_marginLeft="3dp"
             android:id="@+id/seven"
-            android:layout_width="@dimen/image_button_h_w"
+            android:layout_width="90dp"
             android:layout_height="80dp"
             android:onClick="buttonClick"/>
 
         <ImageButton
-            android:layout_marginLeft="0dp"
+            android:layout_marginLeft="10dp"
             android:id="@+id/eight"
-            android:layout_width="@dimen/image_button_h_w"
+            android:layout_width="90dp"
             android:layout_height="80dp"
             android:onClick="buttonClick"/>
 
         <ImageButton
-            android:layout_marginLeft="4dp"
+            android:layout_marginLeft="10dp"
             android:id="@+id/nine"
-            android:layout_width="@dimen/image_button_h_w"
+            android:layout_width="90dp"
             android:layout_height="80dp"
             android:onClick="buttonClick"/>
 

@@ -1,4 +1,5 @@
         package com.example.tictactoe;
+        import android.graphics.Color;
         import android.media.MediaPlayer;
         import android.os.Handler;
         import android.support.v7.app.AppCompatActivity;
@@ -141,7 +142,12 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
         }
-
+        if (theme == 6 || theme == 7) {
+            output.setTextColor(Color.WHITE);
+        } else {
+            output.setTextColor(Color.BLACK);
+        }
+        output.setText("X starts first!");
     }
 
     /** This switch operates the Spinner dropdown choice menu
@@ -175,10 +181,12 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
             case 5:
                 frame.setBackgroundResource(R.drawable.tictactemplate_jungle);
                 theme = 6;
+                output.setTextColor(Color.WHITE);
                 break;
             case 6:
                 frame.setBackgroundResource(R.drawable.tictactemplate_hightech);
                 theme = 7;
+                output.setTextColor(Color.WHITE);
                 break;
         }
     }
@@ -207,7 +215,15 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
             /** After move is made, set text to show it's the next player's turn
              * and update the state of the game board
              */
+
+            if (theme == 6 || theme == 7) {
+                output.setTextColor(Color.WHITE);
+            } else {
+                output.setTextColor(Color.BLACK);
+            }
             output.setText("O's turn to play!");
+
+
             unsetNumbers.remove(view);
             int i;
             for (i = 0; i < 9; i++) {
@@ -218,7 +234,8 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
 
-            /** If playing versus a Computer player in medium or hard, this section gets activated **/
+            /** If playing versus a Computer player in medium or hard, this section gets activated
+             * which sends the game state to the Easy and Hard AI methods way down below**/
             if (aiMode.equalsIgnoreCase("pvcmed") || aiMode.equalsIgnoreCase("pvchard")) {
 
                 int row;
@@ -245,7 +262,13 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
              * For Medium AI, alternating calls are made between Easy and Hard AI.
              */
             if(aiMode.equalsIgnoreCase("pvceasy") && winner==false) {
+                if (theme == 6 || theme == 7) {
+                    output.setTextColor(Color.WHITE);
+                } else {
+                    output.setTextColor(Color.BLACK);
+                }
                 output.setText("O's turn to play!");
+
                 Runnable r = new Runnable() {
                     @Override
                     public void run() {
@@ -304,8 +327,14 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
             } else {
                 view.setBackgroundResource(R.drawable.o);
             }
-
             output.setText("X's turn to play!");
+            if (theme == 6 || theme == 7) {
+                output.setTextColor(Color.WHITE);
+            } else {
+                output.setTextColor(Color.BLACK);
+            }
+                output.setText("X's turn to play!");
+
             for (int i = 0; i < 9; i++) {
                 if (view == numbers[i]) {
                     gamePlays[i] = 2;
@@ -327,6 +356,12 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
 
     /** Tests every combination of 3 in a row for win states **/
     private void checkWinPlayerOne () {
+        if (theme == 6 || theme == 7) {
+            output.setTextColor(Color.WHITE);
+        } else {
+            output.setTextColor(Color.BLACK);
+        }
+
         TextView output = findViewById(R.id.game_state);
         if (gamePlays[0] == 1 && gamePlays[1] == 1 && gamePlays[2] == 1) {
             output.setText("The winner is X!");
@@ -380,6 +415,12 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
 
     /** Again, testing every combination of 3 in a row but this time for player 2 **/
     private void checkWinPlayerTwo() {
+        if (theme == 6 || theme == 7) {
+            output.setTextColor(Color.WHITE);
+        } else {
+            output.setTextColor(Color.BLACK);
+        }
+
         TextView output = findViewById(R.id.game_state);
         if (gamePlays[0] == 2 &&  gamePlays[1] == 2 && gamePlays[2] == 2) {
             output.setText("The winner is 0!");
@@ -468,6 +509,12 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
      * the game keeps running.
      */
     private void checkTie() {
+        if (theme == 6 || theme == 7) {
+            output.setTextColor(Color.WHITE);
+        } else {
+            output.setTextColor(Color.BLACK);
+        }
+
         TextView output = findViewById(R.id.game_state);
         if(gamePlays[0] != 0 && gamePlays[1] != 0 && gamePlays[2] != 0 && gamePlays[3] != 0 && gamePlays[4] != 0
                 && gamePlays[5] != 0 && gamePlays[6] != 0 && gamePlays[7] != 0 && gamePlays[8] != 0 && !winner) {
@@ -524,13 +571,34 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
         }
+        if (theme == 6 || theme == 7) {
+            output.setTextColor(Color.WHITE);
+        } else {
+            output.setTextColor(Color.BLACK);
+        }
+        output.setText("X starts first!");
+
     }
 
     /**
     By default player two is the AI in AI mode.
     Easy mode: Choose random open game space.
-    */
+
+     These are the actual Easy and Hard AI moves
+     that easy, medium, and hard above call combinations of
+
+     The above Easy, Medium, and Hard AI methods feed the board
+     and other state info into these methods which then
+     execute the play and then over write the new board state,
+     and then pass the turn back to Player 1.
+    **/
     private void aiEasyPlay() {
+        if (theme == 6 || theme == 7) {
+            output.setTextColor(Color.WHITE);
+        } else {
+            output.setTextColor(Color.BLACK);
+        }
+
         turnNumber++;
         Collections.shuffle(unsetNumbers);
 
@@ -556,6 +624,12 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void aiHardPlay() {
+        if (theme == 6 || theme == 7) {
+            output.setTextColor(Color.WHITE);
+        } else {
+            output.setTextColor(Color.BLACK);
+        }
+
         turnNumber++;
         state.setBoard(board);
         Action move = x.chooseMove(state);
@@ -582,9 +656,7 @@ public class GameActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
         }
-        output.setText("O's turn to play!");
+        output.setText("X's turn to play!");
         checkWin();
     }
-
-
 }
